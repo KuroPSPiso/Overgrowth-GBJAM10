@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "FUNC.C": "cpp",
+        "FUNC.H": "cpp"
+    }
+}
