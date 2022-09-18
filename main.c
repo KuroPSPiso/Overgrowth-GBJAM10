@@ -1,19 +1,25 @@
-
 #include "FUNC.H"
 
 #include "sprites/alpha.h"
-#include "lvl.c"
+#include "lvl.h"
 #include "controls.c"
 
-
+/*================================
+ *----------[INTERUPTS]-----------
+ *================================
+ */
 //timer tick
 void timer_isr(void)
 {
 	lvlTimer++;
 }
 
+/*================================
+ *----------[FUNCTIONS]-----------
+ *================================
+ */
 //init settings
-void init()
+void init(void)
 {
     lvlTimer = 0;
 
@@ -31,54 +37,41 @@ void init()
 }
 
 //clear screen
-void cls()
+void cls(void)
 {
     //TODO: BLANK
+	return;
 }
 
-void updateSwitches() {
+void checkInput(void) {
+
+	if (joypad() & J_B) {
+		// The B button was pressed!
+	}
+
+}
+
+void updateSwitches(void) {
 	HIDE_WIN;
 	SHOW_SPRITES;
 	SHOW_BKG;
 }
 
-//void main(void)
-//{
-//    //Init();
-//    DISPLAY_ON;
-//    set_bkg_data(0, 47, alpha);
-//    LevelLoad();
-//
-//    CLS();
-//    
-//    for(;;)//loop
-//    {
-//        updateSwitches();
-//        wait_vbl_done();
-//    }
-//}
-
-void checkInput();
-
+/*================================
+ *-------------[MAIN]-------------
+ *================================
+ */
 void main() {
 
 	init();
-	//LevelLoad();
-	set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
+	LevelLoad();
+	//set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
 
 	for(;;) {
 
 		checkInput();				  // Check for user input (and act on it)
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop
 		wait_vbl_done();			// Wait until VBLANK to avoid corrupting visual memory
-	}
-
-}
-
-void checkInput() {
-
-	if (joypad() & J_B) {
-		// The B button was pressed!
 	}
 
 }

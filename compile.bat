@@ -1,21 +1,48 @@
-#rm previous compile
-DEL *.gb
+CLS
+@ECHO OFF
 
-RMDIR /S compile
+REM====================================================
+REM rm previous compile, create backup
 
-if not exist "compile/" (
-  mkdir "compile"
-)
-if not exists "compile/sprites/" (
-  mkdir "compile/sprites"
-)
+COPY /b/v/y overgrowth.gb overgrowth.old.gb
+DEL overgrowth.gb 
 
-#make objects
+RMDIR /S /Q compile
+
+ECHO Removed previous compilation
+
+REM====================================================
+REM create compilation folders
+
+MKDIR "compile"
+MKDIR "compile/sprites"
+
+ECHO Created compile folders
+
+REM====================================================
+REM make objects
+
 lcc -c -o compile/main.o main.c
+lcc -c -o compile/lvl.o lvl.c
 lcc -c -o compile/sprites/alpha.o sprites/alpha.c
+lcc -c -o compile/sprites/bg.o sprites/bg.c
+lcc -c -o compile/sprites/doors.o sprites/doors.c
 
-#compile gb rom
-lcc  -o overgrowth.gb compile/main.o compile/sprites/alpha.o
+ECHO Created objects
 
-#playtest
+REM====================================================
+REM compile gb rom
+
+lcc  -o overgrowth.gb^
+ compile/main.o^
+ compile/lvl.o^
+ compile/sprites/alpha.o^
+ compile/sprites/bg.o
+
+ECHO Created ROM
+
+REM====================================================
+REM playtest
+ECHO Launching Playtest
 bgb ./overgrowth.gb
+EXIT
