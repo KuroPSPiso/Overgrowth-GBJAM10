@@ -1,9 +1,9 @@
 
 #include "FUNC.H"
 
-#include "lvl.h"
+#include "sprites/alpha.h"
+#include "lvl.c"
 #include "controls.c"
-#include "sprites/alpha.c"
 
 
 //timer tick
@@ -63,8 +63,8 @@ void checkInput();
 void main() {
 
 	init();
-	LevelLoad();
-	//set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
+	//LevelLoad();
+	set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
 
 	for(;;) {
 

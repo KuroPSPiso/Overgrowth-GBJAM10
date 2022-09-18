@@ -1,6 +1,6 @@
 /*
 
- BG.H
+ BG_BASE.H
 
  Include File.
 
@@ -9,8 +9,8 @@
   Format               : Gameboy 4 color.
   Compression          : None.
   Counter              : None.
-  Tile size            : 32 x 32
-  Tiles                : 0 to 1
+  Tile size            : 8 x 16
+  Tiles                : 0 to 7
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -24,8 +24,8 @@
 
 
 /* Bank of tiles. */
-
+#define bg_image_p1Bank 0
 /* Start of tile array. */
 extern unsigned char bg_image_p1[];
 
-/* End of BG.H */
+/* End of BG_BASE.H */

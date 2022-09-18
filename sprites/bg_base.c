@@ -1,6 +1,6 @@
 /*
 
- BG.C
+ BG_BASE.C
 
  Tile Source File.
 
@@ -9,8 +9,8 @@
   Format               : Gameboy 4 color.
   Compression          : None.
   Counter              : None.
-  Tile size            : 32 x 32
-  Tiles                : 0 to 1
+  Tile size            : 8 x 16
+  Tiles                : 0 to 7
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -59,4 +59,4 @@ unsigned char bg_image_p1[] =
   0xF4,0x1F,0xFC,0x1F,0xF8,0x0F,0xFF,0x1F
 };
 
-/* End of BG.C */
+/* End of BG_BASE.C */
