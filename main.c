@@ -39,8 +39,21 @@ void init(void)
 //clear screen
 void cls(void)
 {
-    //TODO: BLANK
-	return;
+	uint8_t sprite_cls[16] = {
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	};
+
+	set_bkg_data(0x00,0x01,bg_sprite_cls);
+	uint8_t cls_map[] = { 0x00 };
+
+	for(int x = 0; x < 20; x++)
+	{
+		for(int y = 0; y < 18; y++)
+		{
+    		set_bkg_tiles(x,y,1,1,cls_map);
+		}
+	}
 }
 
 void checkInput(void) {
@@ -64,14 +77,13 @@ void updateSwitches(void) {
 void main() {
 
 	init();
+	cls();
 	LevelLoad();
 	//set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
 
 	for(;;) {
-
 		checkInput();				  // Check for user input (and act on it)
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop
 		wait_vbl_done();			// Wait until VBLANK to avoid corrupting visual memory
 	}
-
 }

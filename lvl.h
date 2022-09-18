@@ -4,6 +4,7 @@
 #include "FUNC.H"
 #include "sprites/bg.h"
 #include "sprites/alpha.h"
+#include "maps/bg.h"
 
 extern uint8_t level;
 extern const uint8_t maxLevel;
