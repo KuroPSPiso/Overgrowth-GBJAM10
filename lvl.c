@@ -49,70 +49,15 @@ void scrollMainMenuLCD(){
     
     if (LYC_REG == 0x00)
     {
-        //scrollSpeed++;
-        //if (scrollSpeed > 5) scrollSpeed = 1;
-        
-        SCX_REG = offsets[scrollSpeed%12] * scrollIntensity;
-        scrollSpeed++;
+        SCX_REG = offsets[(scrollSpeed + LYC_REG)%12] * scrollIntensity;
         LYC_REG = 0x20;
     }
     else if (LYC_REG == 0x20)
     {
         SCX_REG = 0;
         LYC_REG = 0x00;
+        scrollSpeed++;
     }
-
-
-    /*carrousel++;
-    if (carrousel >= 10)
-    {
-        carrousel = 0;
-        printf("%x %x\n", STAT_REG, STAT_REG & 3);
-    }*/
-    /*if ((STAT_REG & 3) == 0)
-    {
-        SCX_REG++;
-    }*/
-    /*
-    carrousel++;
-    if (carrousel >= 10)
-    {
-        carrousel = 0;
-        printf("%x %x %x\n", LY_REG, LYC_REG, STAT_REG);
-    }*/
-
-    /*
-    SCX_REG = 0;
-    for (; LYC_REG < 60; LYC_REG++)
-    {
-        SCX_REG = 20;
-    }*/
-    /*
-    if(carrouselNormal)
-    {
-        carrousel++;
-    } 
-    else
-    {
-        carrousel--;
-    }
-    uint8_t parallaxOffset = 0;
-
-    for(LYC_REG = 0; LYC_REG < 60; LYC_REG++)
-    {
-        if(LYC_REG < 60)
-        {
-            SCX_REG = 10 - (carrousel / 4);
-        }
-        else
-        {
-            SCX_REG= 0;
-        }
-    }
-    SCX_REG= 0;
-
-    LYC_REG = 0;
-    */
 }
 
 void MainMenu_Load(void)
