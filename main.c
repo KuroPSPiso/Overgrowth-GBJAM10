@@ -28,9 +28,9 @@ void init(void)
     DISPLAY_OFF;
 	ENABLE_RAM;
 	SWITCH_RAM_MBC1(1);
-    NR52_REG = 0x8F;	// Turn on the sound
-	NR51_REG = 0x11;	// Enable the sound channels
+    NR52_REG = 0x80; //0x8F;	// Turn on the sound
 	NR50_REG = 0x77;	// Increase the volume to its max
+	NR51_REG = 0xFF; //0x11;	// Enable the sound channels
 	//BGP_REG = OBP0_REG;	// Set Palette
 	BGP_REG = 0xE4U;
 
@@ -67,9 +67,21 @@ void clsBG(void)
 
 void checkInput(void) {
 
-	if (joypad() & J_B) {
-		// The B button was pressed!
+	uint8_t joypad_state = joypad();
+	if(joypad_state){
+
+		NR10_REG = 0x16;
+		NR11_REG = 0x40;
+		NR12_REG = 0x73;
+		NR13_REG = 0x00;
+		NR14_REG = 0xC3;
+
+		delay(1000);
 	}
+
+	/*if (joypad() & J_B) {
+		// The B button was pressed!
+	}*/
 
 }
 
