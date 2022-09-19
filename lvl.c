@@ -27,26 +27,38 @@ void LevelLoad(void)
     }
 }
 
-uint8_t scroll1 = 10, scroll2 = 15, scroll3 = 30;
+
+uint8_t offsets[] = {
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    5,
+    4,
+    3,
+    2,
+    1,
+    0
+};
+uint8_t scrollSpeed = 0;
+uint8_t scrollIntensity = 1;
 
 void scrollMainMenuLCD(){
     
     if (LYC_REG == 0x00)
     {
-        //move_bkg(scroll1, 0);
-        SCX_REG = scroll1;
+        //scrollSpeed++;
+        //if (scrollSpeed > 5) scrollSpeed = 1;
+        
+        SCX_REG = offsets[scrollSpeed%12] * scrollIntensity;
+        scrollSpeed++;
         LYC_REG = 0x20;
     }
     else if (LYC_REG == 0x20)
     {
-        //move_bkg(scroll2, 0);
-        SCX_REG = scroll2;
-        LYC_REG = 0x40;
-    }
-    else if (LYC_REG == 0x40)
-    {
-        //move_bkg(scroll3, 0);
-        SCX_REG = scroll3;
+        SCX_REG = 0;
         LYC_REG = 0x00;
     }
 
@@ -163,9 +175,6 @@ void clsBG(void)
 
 void MainMenu_Update(void)
 {
-    scroll1++;
-    scroll2+=2;
-    scroll3+=3;
     //LYC_REG+=2;
 
     //printf("%x\r", LY_REG);
