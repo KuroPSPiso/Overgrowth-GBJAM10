@@ -45,26 +45,6 @@ void init(void)
     DISPLAY_ON;
 }
 
-//clear screen
-void clsBG(void)
-{
-	uint8_t sprite_cls[16] = {
-		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-	};
-
-	set_bkg_data(0x00,0x01,sprite_bg_cls);
-	uint8_t cls_map[] = { 0x00 };
-
-	for(int x = 0; x < 20; x++)
-	{
-		for(int y = 0; y < 18; y++)
-		{
-    		set_bkg_tiles(x,y,1,1,cls_map);
-		}
-	}
-}
-
 void checkInput(void) {
 
 	uint8_t joypad_state = joypad();

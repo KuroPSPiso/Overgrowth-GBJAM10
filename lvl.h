@@ -11,6 +11,7 @@ extern uint8_t level;
 extern const uint8_t maxLevel;
 extern uint8_t lvlTimer;
 
+void clsBG(void);
 /* Level details:
  * - -1: ERR?
  * - 0: Main Menu
