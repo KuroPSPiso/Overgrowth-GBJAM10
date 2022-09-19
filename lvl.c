@@ -11,37 +11,169 @@ void SetLevel(int level)
 
 void LevelLoad(void)
 {
+    disable_interrupts();
+    remove_LCD(scrollMainMenuLCD);
+    enable_interrupts();
+    //set_interrupts(LCD_IFLAG);
+
     switch (level)
     {
     case 1:
-        Stage1();
+        Stage1_Load();
         break;
     default:
-        MainMenu();
+        MainMenu_Load();
         break;
     }
 }
 
-void MainMenu(void)
-{
-    //draw bg
-    set_bkg_data(0,25,bg_sprite_top);
-    set_bkg_tiles(8,4,8,4,bg_map_top);
-    
-    set_bkg_data(26,32,bg_sprite_bottom);
-    //
-    set_bkg_based_tiles(8,8,8,4,bg_map_bottom,0x1A);
-    /*uint8_t bg_map_bottom_offset[32];
-    vmemcpy(bg_map_bottom, bg_map_bottom_offset, 32);
-    for(uint8_t x = 0; x < 32; x++){
-        bg_map_bottom_offset[x] += 0x1A;
+uint16_t carrousel = 0;
+BOOL carrouselNormal = TRUE;
+
+void scrollMainMenuLCD(){
+    if(carrousel >= 80) carrouselNormal = FALSE;
+    if(carrousel <= 0) carrouselNormal = TRUE;
+    /*if(carrousel >= 10) carrouselNormal = FALSE;
+    if(carrousel <= 0) carrouselNormal = TRUE;
+    for(LYC_REG = 0; LYC_REG < 100; LYC_REG++)
+    {
+        if(LY_REG == LYC_REG)
+        {
+            if(carrouselNormal) carrousel++;
+            else carrousel--;
+            SCX_REG -= 2 + (carrousel - 5);
+        }
+    }*/
+
+    if(carrouselNormal)
+    {
+        carrousel++;
+    } 
+    else
+    {
+        carrousel--;
     }
-    set_bkg_tiles(8,8,8,4,bg_map_bottom_offset);
+    uint8_t parallaxOffset = 0;
+
+    for(LYC_REG = 0; LYC_REG < 60; LYC_REG++)
+    {
+        if(LYC_REG < 60)
+        {
+            SCX_REG = 10 - (carrousel / 4);
+        }
+        else
+        {
+            SCX_REG= 0;
+        }
+    }
+    SCX_REG= 0;
+
+    LYC_REG = 0;
+
+    /*
+    if(LY_REG == LYC_REG)
+        {
+            SCX_REG = carrousel;
+        }
     */
 
+
+    /*
+    SCX_REG = 0;
+    if(LY_REG == LYC_REG)
+    {
+        for(LYC_REG = 0; LYC_REG < 40; LYC_REG++)
+        {
+            SCX_REG-= (1 + (carrousel-10));
+            carrousel++;
+        }
+    }
+    */
+
+
+    /*
+    SCX_REG = 0;
+    if(LY_REG == LYC_REG)
+    {
+        if(LYC_REG < 40)
+        {
+            carrousel++;
+            if(carrousel > 5) carrousel = 0;
+            for(; LYC_REG < 5; LYC_REG++)
+            {
+                SCX_REG+= (carrousel);
+            }
+            for(; LYC_REG < 10; LYC_REG++)
+            {
+                SCX_REG+= (carrousel);
+            }
+            for(; LYC_REG < 15; LYC_REG++)
+            {
+                SCX_REG+= (carrousel);
+            }
+            for(; LYC_REG < 20; LYC_REG++)
+            {
+                SCX_REG+= (carrousel);
+            }
+            for(; LYC_REG < 40; LYC_REG++)
+            {
+                SCX_REG+= (carrousel);
+            }
+        } else {
+            SCX_REG = 0;
+            LYC_REG = 0;
+        }
+    }*/
 }
 
-void Stage1(void)
+void MainMenu_Load(void)
+{
+    //draw bg
+    set_bkg_data(0,25,sprite_bg_top);
+    set_bkg_data(26,32,sprite_bg_bottom);
+    set_bkg_data(58,48,sprite_alpha);
+
+    set_bkg_based_tiles(5,2,10,1,map_alpha_overgrowth,0x3A);
+    set_bkg_tiles(6,5,8,4,map_bg_top);
+    set_bkg_based_tiles(6,9,8,4,map_bg_bottom,0x1A);
+    set_bkg_based_tiles(4,14,5,1,map_alpha_press,0x3A);
+    set_bkg_based_tiles(11,14,5,1,map_alpha_start,0x3A);
+
+    STAT_REG = 0x45;
+    LYC_REG = 0x00;
+
+    disable_interrupts();
+    add_LCD(scrollMainMenuLCD);
+    enable_interrupts();
+
+    set_interrupts(VBL_IFLAG | LCD_IFLAG);
+}
+
+void Stage1_Load(void)
 {
     return;
+}
+
+void Update(void)
+{
+    switch (level)
+    {
+    default:
+        MainMenu_Update();
+        break;
+    }
+}
+
+
+void MainMenu_Update(void)
+{
+    //printf("%x\r", LY_REG);
+    //animate carrousel
+    /*if(LYC_REG > 0 && LYC_REG < 100)
+    {
+        SCX_REG = carrousel;
+
+        carrousel++;
+    }
+    SCX_REG = 0;*/
 }

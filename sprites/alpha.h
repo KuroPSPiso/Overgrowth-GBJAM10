@@ -1,6 +1,6 @@
-#ifndef ALPHA_H
-#define ALPHA_H
+#ifndef _SPRITES_ALPHA_H
+#define _SPRITES_ALPHA_H
 
-extern unsigned char alpha[];
+extern unsigned char sprite_alpha[];
 
-#endif
+#endif //_SPRITES_ALPHA_H

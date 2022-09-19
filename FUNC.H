@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include <stdint.h>
+#include <stdio.h>
 
 typedef unsigned char BOOL;
 

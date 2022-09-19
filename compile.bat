@@ -26,6 +26,7 @@ REM make objects
 lcc -c -o compile/main.o main.c
 lcc -c -o compile/lvl.o lvl.c
 lcc -c -o compile/sprites/alpha.o sprites/alpha.c
+lcc -c -o compile/maps/alpha.o maps/alpha.c
 lcc -c -o compile/sprites/bg.o sprites/bg.c
 lcc -c -o compile/maps/bg.o maps/bg.c
 lcc -c -o compile/sprites/doors.o sprites/doors.c
@@ -39,6 +40,7 @@ lcc  -o overgrowth.gb^
  compile/main.o^
  compile/lvl.o^
  compile/sprites/alpha.o^
+ compile/maps/alpha.o^
  compile/sprites/bg.o^
  compile/maps/bg.o
 

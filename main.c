@@ -26,6 +26,8 @@ void init(void)
     lvlTimer = 0;
 
     DISPLAY_OFF;
+	ENABLE_RAM;
+	SWITCH_RAM_MBC1(1);
     NR52_REG = 0x8F;	// Turn on the sound
 	NR51_REG = 0x11;	// Enable the sound channels
 	NR50_REG = 0x77;	// Increase the volume to its max
@@ -33,9 +35,10 @@ void init(void)
 	BGP_REG = 0xE4U;
 
     //interupts
-    disable_interrupts();
-    add_TIM(timer_isr);
-    enable_interrupts();
+    //disable_interrupts();
+    //add_TIM(timer_isr);
+	
+    //enable_interrupts();
 
     //set_interrupts(TIM_IFLAG);
     
@@ -43,14 +46,14 @@ void init(void)
 }
 
 //clear screen
-void cls(void)
+void clsBG(void)
 {
 	uint8_t sprite_cls[16] = {
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 	};
 
-	set_bkg_data(0x00,0x01,bg_sprite_cls);
+	set_bkg_data(0x00,0x01,sprite_bg_cls);
 	uint8_t cls_map[] = { 0x00 };
 
 	for(int x = 0; x < 20; x++)
@@ -117,7 +120,7 @@ BOOL fade(BOOL in)
 void main() {
 
 	init();
-	cls();
+	clsBG();
 	LevelLoad();
 
 
@@ -145,6 +148,7 @@ void main() {
 		// 	localTimer = 0;
 		// }
 		// //BGP_REG = TIMA_REG;
+		Update();
 
 		checkInput();				  // Check for user input (and act on it)
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop

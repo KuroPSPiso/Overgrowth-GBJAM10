@@ -1,13 +1,13 @@
 #ifndef _MAPS_BG
 #define _MAPS_BG
 
-extern unsigned char bg_map_cls[];
+extern unsigned char map_bg_cls[];
 
-#define bg_map_Width 8
-#define bg_map_Height 4
-#define bg_map_Bank 0
+#define map_bg_Width 8
+#define map_bg_Height 4
+#define map_bg_Bank 0
 
-extern unsigned char bg_map_top[];
-extern unsigned char bg_map_bottom[];
+extern unsigned char map_bg_top[];
+extern unsigned char map_bg_bottom[];
 
 #endif //_MAPS_BG
