@@ -4,6 +4,7 @@
         "FUNC.C": "cpp",
         "FUNC.H": "cpp",
         "alpha.h": "c",
-        "bg.h": "c"
+        "bg.h": "c",
+        "lvl.h": "c"
     }
 }

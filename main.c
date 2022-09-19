@@ -9,9 +9,11 @@
  *================================
  */
 //timer tick
+UWORD count;
+
 void timer_isr(void)
 {
-	lvlTimer++;
+    count++;
 }
 
 /*================================
@@ -23,15 +25,19 @@ void init(void)
 {
     lvlTimer = 0;
 
-    //interupts
     DISPLAY_OFF;
     NR52_REG = 0x8F;	// Turn on the sound
 	NR51_REG = 0x11;	// Enable the sound channels
 	NR50_REG = 0x77;	// Increase the volume to its max
+	//BGP_REG = OBP0_REG;	// Set Palette
+	BGP_REG = 0xE4U;
 
+    //interupts
     disable_interrupts();
-	add_TIM(timer_isr);
-	enable_interrupts();
+    add_TIM(timer_isr);
+    enable_interrupts();
+
+    //set_interrupts(TIM_IFLAG);
     
     DISPLAY_ON;
 }
@@ -70,6 +76,40 @@ void updateSwitches(void) {
 	SHOW_BKG;
 }
 
+
+uint8_t fadeTimer = 0;
+uint8_t fadeLvl = 1;
+BOOL fade(BOOL in)
+{
+	if(fadeTimer >= CLOCKS_PER_SEC){
+		switch (fadeLvl)
+		{
+		case 01:
+			BGP_REG = 0xFEU;
+			break;
+		case 02:
+			BGP_REG = 0xFFU;
+			break;
+		case 03:
+			BGP_REG = 0xE4U;
+			break;
+		default:
+			BGP_REG = 0xF9U;
+			break;
+		}
+
+		(in == TRUE)? fadeLvl++ : fadeLvl--;
+	}
+	if(in == FALSE)
+	{
+		return (fadeLvl >= 3)? TRUE : FALSE;
+	}
+	else
+	{
+		return (fadeLvl <= 0)? TRUE : FALSE;
+	}
+}
+
 /*================================
  *-------------[MAIN]-------------
  *================================
@@ -79,9 +119,33 @@ void main() {
 	init();
 	cls();
 	LevelLoad();
-	//set_bkg_data(0, 47, alpha);		// Load 47 tiles into background memory
+
 
 	for(;;) {
+		// CHECKFADE:		
+		// if(fade(FALSE) == FALSE) goto CHECKFADE;
+		// localTimer++;
+		// if(localTimer >= CLOCKS_PER_SEC){
+		// 	TIMA_REG++; //every 0.1sec on /10 == 1:1 per CLOCKS_PER_SEC
+		// 	switch (TIMA_REG)
+		// 	{
+		// 	case 01:
+		// 		BGP_REG = 0xF9U;
+		// 		break;
+		// 	case 02:
+		// 		BGP_REG = 0xFEU;
+		// 		break;
+		// 	case 03:
+		// 		BGP_REG = 0xFFU;
+		// 		break;
+		// 	default:
+		// 		BGP_REG = 0xE4U;
+		// 		break;
+		// 	}
+		// 	localTimer = 0;
+		// }
+		// //BGP_REG = TIMA_REG;
+
 		checkInput();				  // Check for user input (and act on it)
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop
 		wait_vbl_done();			// Wait until VBLANK to avoid corrupting visual memory
