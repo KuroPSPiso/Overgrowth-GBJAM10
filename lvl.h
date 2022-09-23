@@ -5,11 +5,13 @@
 #include "sprites/bg.h"
 #include "sprites/alpha.h"
 #include "maps/bg.h"
+#include "maps/alpha.h"
 
 extern uint8_t level;
 extern const uint8_t maxLevel;
 extern uint8_t lvlTimer;
 
+void clsBG(void);
 /* Level details:
  * - -1: ERR?
  * - 0: Main Menu
@@ -20,7 +22,13 @@ extern uint8_t lvlTimer;
 
 void SetLevel(int level);
 void LevelLoad(void);
-void MainMenu(void);
-void Stage1(void);
+void MainMenu_Load(void);
+void Stage1_Load(void);
+
+void Update(void);
+void MainMenu_Update(void);
+
+//interupts
+void scrollMainMenuLCD();
 
 #endif //LVL_H

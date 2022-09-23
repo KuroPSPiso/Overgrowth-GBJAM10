@@ -4,8 +4,10 @@
 //TODO: rem line on compile
 //#include <../../../include/gb/gb.h>
 #include <gb/gb.h>
+#include <time.h>
 
 #include <stdint.h>
+#include <stdio.h>
 
 typedef unsigned char BOOL;
 
