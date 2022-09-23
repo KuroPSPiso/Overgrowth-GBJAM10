@@ -17,6 +17,7 @@ REM create compilation folders
 MKDIR "compile"
 MKDIR "compile/sprites"
 MKDIR "compile/maps"
+MKDIR "compile/sounds"
 
 ECHO Created compile folders
 
@@ -30,6 +31,7 @@ lcc -c -o compile/maps/alpha.o maps/alpha.c
 lcc -c -o compile/sprites/bg.o sprites/bg.c
 lcc -c -o compile/maps/bg.o maps/bg.c
 lcc -c -o compile/sprites/doors.o sprites/doors.c
+lcc -c -o compile/sounds/sfx.o sounds/sfx.c
 
 ECHO Created objects
 
@@ -42,7 +44,8 @@ lcc  -o overgrowth.gb^
  compile/sprites/alpha.o^
  compile/maps/alpha.o^
  compile/sprites/bg.o^
- compile/maps/bg.o
+ compile/maps/bg.o^
+ compile/sounds/sfx.o
 
 ECHO Created ROM
 

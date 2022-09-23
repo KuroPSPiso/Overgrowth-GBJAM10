@@ -3,6 +3,7 @@
 #include "sprites/alpha.h"
 #include "lvl.h"
 #include "controls.c"
+#include "sounds/sfx.h"
 
 /*================================
  *----------[INTERUPTS]-----------
@@ -45,18 +46,80 @@ void init(void)
     DISPLAY_ON;
 }
 
+uint8_t currSnd[6];
+void setSnd(uint8_t snd)
+{
+	switch (snd)
+	{
+	case 0x23:
+		currSnd[0] = snd_spray[0];
+		currSnd[1] = snd_spray[1];
+		currSnd[2] = snd_spray[2];
+		currSnd[3] = snd_spray[3];
+		currSnd[4] = snd_spray[4];
+		break;
+	case 0x22:
+		currSnd[0] = snd_hit[0];
+		currSnd[1] = snd_hit[1];
+		currSnd[2] = snd_hit[2];
+		currSnd[3] = snd_hit[3];
+		currSnd[4] = snd_hit[4];
+		currSnd[5] = snd_hit[5];
+		break;
+	case 0x21:
+		currSnd[0] = snd_attack[0];
+		currSnd[1] = snd_attack[1];
+		currSnd[2] = snd_attack[2];
+		currSnd[3] = snd_attack[3];
+		currSnd[4] = snd_attack[4];
+		break;
+	case 0x20:
+		currSnd[0] = snd_jump[0];
+		currSnd[1] = snd_jump[1];
+		currSnd[2] = snd_jump[2];
+		currSnd[3] = snd_jump[3];
+		currSnd[4] = snd_jump[4];
+		currSnd[5] = snd_jump[5];
+		break;
+	case 0x10:
+		currSnd[0] = snd_select[0];
+		currSnd[1] = snd_select[1];
+		currSnd[2] = snd_select[2];
+		currSnd[3] = snd_select[3];
+		currSnd[4] = snd_select[4];
+		currSnd[5] = snd_select[5];
+		break;
+	default:
+		currSnd[0] = snd_NONE[0];
+		break;
+	}
+}
+
 void checkInput(void) {
 
 	uint8_t joypad_state = joypad();
-	if(joypad_state){
+	if(joypad_state == J_START){
 
-		NR10_REG = 0x16;
-		NR11_REG = 0x40;
-		NR12_REG = 0x73;
-		NR13_REG = 0x00;
-		NR14_REG = 0xC3;
+		setSnd(SFX_MENU_SELECT);
+		switch (currSnd[0])
+		{
+		case 0x04:
+			NR41_REG = currSnd[1];
+			NR42_REG = currSnd[2];
+			NR43_REG = currSnd[3];
+			NR44_REG = currSnd[4];
+			break;
+		case 0x01:
+			NR10_REG = currSnd[1];
+			NR11_REG = currSnd[2];
+			NR12_REG = currSnd[3];
+			NR13_REG = currSnd[4];
+			NR14_REG = currSnd[5];
+			break;
+		}
+		setSnd(SFX_NO_SOUND);
 
-		delay(1000);
+		delay(1000); //joypad delay
 	}
 
 	/*if (joypad() & J_B) {
