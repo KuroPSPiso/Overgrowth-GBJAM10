@@ -6,27 +6,34 @@
 #include "sprites/alpha.h"
 #include "maps/bg.h"
 #include "maps/alpha.h"
+#include "controls.h"
 
 extern uint8_t level;
-extern const uint8_t maxLevel;
 extern uint8_t lvlTimer;
 
 void clsBG(void);
 /* Level details:
  * - -1: ERR?
  * - 0: Main Menu
- * - 1: Stage 1
- * - 2: Stage 2
- * - 3: End
+ * - 1: GameOver
+ * - 2: Stage 1
+ * - 3: Stage 2
+ * etc...
  */
 
+#define LVL_MAINMENU 0
+#define LVL_GAMEOVER 1
+#define LVL_STAGE1	2
 void SetLevel(int level);
+
 void LevelLoad(void);
 void MainMenu_Load(void);
+void GameOver_Load(void);
 void Stage1_Load(void);
 
 void Update(void);
 void MainMenu_Update(void);
+void GameOver_Update(void);
 
 //interupts
 void scrollMainMenuLCD();
