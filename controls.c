@@ -22,7 +22,7 @@ void defaultInput(void)
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);
 		isFading = TRUE;
-		delay(1000); //joypad delay
+		//delay(1000); //joypad delay
 	}
 }
 
@@ -31,7 +31,7 @@ void MainMenu_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state == J_START) 
 	{
-		delay(1000); //joypad delay
+		//delay(1000); //joypad delay
 	}
 }
 
@@ -40,7 +40,7 @@ void GameOver_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state == J_START)
 	{
-		delay(100); //joypad delay
+		//delay(100); //joypad delay
 	}
 }
 

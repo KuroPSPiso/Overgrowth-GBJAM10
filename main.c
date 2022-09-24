@@ -68,7 +68,7 @@ void main() {
 	uint16_t localTimer = 0;
 
 	for (;;) {
-		BOOL doFadeTick = (localTimer >= CLOCKS_PER_SEC);// == 0 && localTimer != 0;
+		BOOL doFadeTick = (localTimer >= CLOCKS_PER_SEC/5);
 		if (doFadeTick == FALSE)
 		{
 			//add clock
