@@ -65,11 +65,32 @@ void main() {
 	level = LVL_MAINMENU;
 	LevelLoad();
 
+	uint16_t localTimer = 0;
 
-	for(;;) {
-		Update();
+	for (;;) {
+		BOOL doFadeTick = (localTimer >= CLOCKS_PER_SEC);// == 0 && localTimer != 0;
+		if (doFadeTick == FALSE)
+		{
+			//add clock
+			localTimer++;
+		}
+		else
+		{
+			//reset clock
+			localTimer = 0;
+		}
 
-		inputCallPTR();				  // Check for user input (and act on it)
+		if (transitionLvl == TRUE)
+		{
+			transitionLvl = FALSE;
+			LevelLoad();
+		}
+		if (!doFade(doFadeTick))
+		{
+			Update();
+
+			inputCallPTR();				  // Check for user input (and act on it)
+		}
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop
 		wait_vbl_done();			// Wait until VBLANK to avoid corrupting visual memory
 	}

@@ -21,7 +21,7 @@ void defaultInput(void)
 		snd_set(SFX_MENU_SELECT);
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);
-
+		isFading = TRUE;
 		delay(1000); //joypad delay
 	}
 }

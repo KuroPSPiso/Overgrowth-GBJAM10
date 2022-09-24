@@ -69,17 +69,17 @@ void snd_playOneShot(void)
 	}
 }
 
-/*
-//MAKING SOLUTION FOR FADE
 
 //track transition
 BOOL isFading = FALSE;
-BOOL fadedIn = FALSE;
+BOOL fadedOut = FALSE;
+BOOL transitionLvl = FALSE;
 int fadeIndex = 3; //0-3
 
-void doFade()
+BOOL doFade(BOOL doTick)
 {
-	if(!isFading) return;
+	if(!isFading) return FALSE;
+	if (doTick == FALSE) return TRUE;
 
 	switch(fadeIndex)
 	{
@@ -87,21 +87,22 @@ void doFade()
 			BGP_REG = 0xE4U;
 			break;
 		case 02:
-			BGP_REG = 0xFFU;
+			BGP_REG = 0xF9U;
 			break;
 		case 01:
 			BGP_REG = 0xFEU;
 			break;
 		default:
-			BGP_REG = 0xF9U;
+			BGP_REG = 0xFFU;
 		break;
 	}
 
-	if(!fadedIn)
+	if(!fadedOut)
 	{
 		if(fadeIndex == 0)
 		{
-			fadedIn = TRUE;
+			fadedOut = TRUE;
+			transitionLvl = TRUE;
 		}
 		else
 		{
@@ -112,18 +113,18 @@ void doFade()
 	{
 		if(fadeIndex == 3)
 		{
-			//faded out
-			isFADING = FALSE;
-			fadedIn = FALSE;
+			//faded back in
+			isFading = FALSE;
+			fadedOut = FALSE;
 		}
 		else
 		{
 			fadeIndex++;
 		}
 	}
-}
 
-*/
+	return TRUE;
+}
 
 /*
 uint8_t fadeTimer = 0;
