@@ -62,6 +62,8 @@ void scrollMainMenuLCD(){
 
 void MainMenu_Load(void)
 {
+    //clsBG();
+
     //draw bg
     set_bkg_data(0,25,sprite_bg_top);
     set_bkg_data(26,32,sprite_bg_bottom);
@@ -81,16 +83,27 @@ void MainMenu_Load(void)
     enable_interrupts();
 
     set_interrupts(VBL_IFLAG | LCD_IFLAG);
+
+    inputCallIndex = 1;
 }
 
 void GameOver_Load(void)
 {
-    return;
+    clsBG();
+
+    printf("\n \n \n \n ---- Game Over ----");
+
+    set_interrupts(VBL_IFLAG);
+
+    inputCallIndex = 2;
 }
 
 void Stage1_Load(void)
 {
-    return;
+
+    set_interrupts(VBL_IFLAG);
+
+    inputCallIndex = 0;
 }
 
 void Update(void)
@@ -114,7 +127,10 @@ void clsBG(void)
         0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     };
 
-    set_bkg_data(0x00, 0x01, sprite_bg_cls);
+    for (int map0 = 0; map0 < 256; map0++)
+    {
+        set_bkg_data(map0, 0x01, sprite_bg_cls);
+    }
     uint8_t cls_map[] = { 0x00 };
 
     for (int x = 0; x < 20; x++)
