@@ -9,9 +9,16 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "sounds/sfx.h"
+
+typedef void (*CallPTR)(void);
 typedef unsigned char BOOL;
 
 #define FALSE 0
 #define TRUE 1
 
+extern uint8_t currSnd[6];
+
+extern void snd_set(uint8_t snd);
+extern void snd_playOneShot(void);
 #endif //FUNC_H

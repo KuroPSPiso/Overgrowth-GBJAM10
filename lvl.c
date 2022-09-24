@@ -2,11 +2,10 @@
 
 uint8_t lvlTimer = 1;
 uint8_t level = 0;
-const uint8_t maxLevel = 0;
 
-void SetLevel(int level)
+void SetLevel(int changeTo)
 {
-    if(level > maxLevel) level = maxLevel;
+    level = changeTo;
 }
 
 void LevelLoad(void)
@@ -18,15 +17,16 @@ void LevelLoad(void)
 
     switch (level)
     {
-    case 1:
+    case LVL_STAGE1:
         Stage1_Load();
         break;
-    default:
+    case LVL_GAMEOVER:
+        GameOver_Load();
+    default: //load mainmenu
         MainMenu_Load();
         break;
     }
 }
-
 
 uint8_t offsets[] = {
     0,
@@ -83,6 +83,11 @@ void MainMenu_Load(void)
     set_interrupts(VBL_IFLAG | LCD_IFLAG);
 }
 
+void GameOver_Load(void)
+{
+    return;
+}
+
 void Stage1_Load(void)
 {
     return;
@@ -92,6 +97,9 @@ void Update(void)
 {
     switch (level)
     {
+    case LVL_GAMEOVER:
+        GameOver_Update();
+        break;
     default:
         MainMenu_Update();
         break;
@@ -120,15 +128,10 @@ void clsBG(void)
 
 void MainMenu_Update(void)
 {
-    //LYC_REG+=2;
+    return;
+}
 
-    //printf("%x\r", LY_REG);
-    //animate carrousel
-    /*if(LYC_REG > 0 && LYC_REG < 100)
-    {
-        SCX_REG = carrousel;
-
-        carrousel++;
-    }
-    SCX_REG = 0;*/
+void GameOver_Update(void)
+{
+    return;
 }
