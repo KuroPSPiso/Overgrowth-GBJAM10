@@ -7,6 +7,7 @@
 #include "sprites/alpha.h"
 #include "maps/bg.h"
 #include "maps/alpha.h"
+#include "maps/bg_lvls.h"
 #include "controls.h"
 
 extern uint8_t level;

@@ -1,6 +1,6 @@
-#ifndef BG_LVL_TILES_H
-#define BG_LVL_TILES_H
+#ifndef _SPRITES_BG_LVL_H
+#define _SPRITES_BG_LVL_H
 
 extern unsigned char sprite_bg_lvl[];
 
-#endif // !BG_LVL_TILES_H
+#endif // !_SPRITES_BG_LVLS_H

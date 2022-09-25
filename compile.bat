@@ -33,6 +33,7 @@ lcc -c -o compile/maps/alpha.o maps/alpha.c
 lcc -c -o compile/sprites/bg.o sprites/bg.c
 lcc -c -o compile/sprites/bg_lvl.o sprites/bg_lvl.c
 lcc -c -o compile/maps/bg.o maps/bg.c
+lcc -c -o compile/maps/bg_lvls.o maps/bg_lvls.c
 lcc -c -o compile/sprites/doors.o sprites/doors.c
 lcc -c -o compile/sounds/sfx.o sounds/sfx.c
 
@@ -51,6 +52,7 @@ lcc  -o overgrowth.gb^
  compile/sprites/bg.o^
  compile/sprites/bg_lvl.o^
  compile/maps/bg.o^
+ compile/maps/bg_lvls.o^
  compile/sounds/sfx.o
 
 ECHO Created ROM

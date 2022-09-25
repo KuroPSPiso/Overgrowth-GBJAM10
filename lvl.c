@@ -105,9 +105,15 @@ void GameOver_Load(void)
 
 void Stage1_Load(void)
 {
+    SCX_REG = 0x00;
     clsBG();
 
-    set_bkg_data(0, 64, sprite_bg_lvl);
+    set_bkg_data(1, 64, sprite_bg_lvl);
+    //TODO: re-export lvl maps
+
+    set_bkg_based_tiles(0, 0, map_bg_lvl1_Width, map_bg_lvl1_Height, map_bg_lvl1, 0x01);
+    //despawn every 0x10 blocks
+    set_bkg_based_tiles(0, 0, map_bg_lvl1_Width, map_bg_lvl1_Height, map_bg_lvl1, 0x01);
 
     set_interrupts(VBL_IFLAG);
 
