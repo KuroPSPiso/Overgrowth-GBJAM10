@@ -56,7 +56,7 @@ void updateSwitches(void) {
  *================================
  */
 void main() {
-	inputCallIndex = 0;
+	inputCallIndex = 1;
 
 	init();
 	clsBG();

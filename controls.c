@@ -51,9 +51,9 @@ void MainMenu_Controls(void)
 void GameOver_Controls(void)
 {
 	joypad_state = joypad();
-	if (joypad_state == J_A)
+	if (joypad_state == J_START)
 	{
-		//SetLevel(LVL_MAINMENU);
+		SetLevel(LVL_MAINMENU);
 		snd_set(SFX_PLAYER_HIT);
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);

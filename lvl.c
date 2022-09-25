@@ -22,6 +22,7 @@ void LevelLoad(void)
         break;
     case LVL_GAMEOVER:
         GameOver_Load();
+        break;
     default: //load mainmenu
         MainMenu_Load();
         break;
@@ -62,7 +63,7 @@ void scrollMainMenuLCD(){
 
 void MainMenu_Load(void)
 {
-    //clsBG();
+    clsBG();
 
     //draw bg
     set_bkg_data(0,25,sprite_bg_top);
@@ -91,7 +92,11 @@ void GameOver_Load(void)
 {
     clsBG();
 
-    printf("\n \n \n \n ---- Game Over ----");
+    set_bkg_data(1, 48, sprite_alpha);
+    set_bkg_based_tiles(5, 6, 10, 1, map_alpha_gameOver, 0x01);
+    set_bkg_based_tiles(6, 8, 8, 1, map_alpha_line, 0x01);
+    set_bkg_based_tiles(4, 12, 5, 1, map_alpha_press, 0x01);
+    set_bkg_based_tiles(11, 12, 5, 1, map_alpha_start, 0x01);
 
     set_interrupts(VBL_IFLAG);
 
@@ -100,6 +105,9 @@ void GameOver_Load(void)
 
 void Stage1_Load(void)
 {
+    clsBG();
+
+    //set_bkg_data(0, 64, sprite_alpha);
 
     set_interrupts(VBL_IFLAG);
 
