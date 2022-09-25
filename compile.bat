@@ -31,6 +31,7 @@ lcc -c -o compile/controls.o controls.c
 lcc -c -o compile/sprites/alpha.o sprites/alpha.c
 lcc -c -o compile/maps/alpha.o maps/alpha.c
 lcc -c -o compile/sprites/bg.o sprites/bg.c
+lcc -c -o compile/sprites/bg_lvl.o sprites/bg_lvl.c
 lcc -c -o compile/maps/bg.o maps/bg.c
 lcc -c -o compile/sprites/doors.o sprites/doors.c
 lcc -c -o compile/sounds/sfx.o sounds/sfx.c
@@ -48,6 +49,7 @@ lcc  -o overgrowth.gb^
  compile/sprites/alpha.o^
  compile/maps/alpha.o^
  compile/sprites/bg.o^
+ compile/sprites/bg_lvl.o^
  compile/maps/bg.o^
  compile/sounds/sfx.o
 

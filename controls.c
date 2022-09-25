@@ -18,15 +18,17 @@ int inputCallIndex = 0;
 const CallPTR inputCallPTR[] = {
 	&default_Controls,
 	&MainMenu_Controls,
-	&GameOver_Controls
+	&GameOver_Controls,
+	&Player_Controls
 };
 
+//does nothing other than play sound/testing purposes.
 void default_Controls(void)
 {
 	joypad_state = joypad();
 	if (joypad_state == J_START)
 	{
-		snd_set(SFX_MENU_SELECT);
+		snd_set(SFX_PLAYER_JUMP);
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);
 		isFading = TRUE;
@@ -39,12 +41,12 @@ void MainMenu_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state == J_START) 
 	{
-		SetLevel(LVL_GAMEOVER);
+		SetLevel(LVL_STAGE1);
 		snd_set(SFX_MENU_SELECT);
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);
 		isFading = TRUE;
-		delay(1000); //joypad delay
+		delay(200); //joypad delay
 	}
 }
 
@@ -58,6 +60,32 @@ void GameOver_Controls(void)
 		snd_playOneShot();
 		snd_set(SFX_NO_SOUND);
 		isFading = TRUE;
-		delay(1000); //joypad delay
+		delay(200); //joypad delay
+	}
+}
+
+void Player_Controls(void)
+{
+	joypad_state = joypad();
+	if (joypad_state == J_LEFT)
+	{
+		SCX_REG--;
+		//delay(100); //joypad delay
+	}
+	else if (joypad_state == J_RIGHT)
+	{
+		SCX_REG++;
+		//delay(100); //joypad delay
+	}
+
+	if (joypad_state == (J_START | J_SELECT))
+	{
+		//manual surrender
+		SetLevel(LVL_GAMEOVER);
+		snd_set(SFX_MENU_SELECT);
+		snd_playOneShot();
+		snd_set(SFX_NO_SOUND);
+		isFading = TRUE;
+		delay(200); //joypad delay
 	}
 }

@@ -85,7 +85,7 @@ void MainMenu_Load(void)
 
     set_interrupts(VBL_IFLAG | LCD_IFLAG);
 
-    inputCallIndex = 1;
+    inputCallIndex = CONTROLS_MAINMENU_INDEX;
 }
 
 void GameOver_Load(void)
@@ -100,24 +100,26 @@ void GameOver_Load(void)
 
     set_interrupts(VBL_IFLAG);
 
-    inputCallIndex = 2;
+    inputCallIndex = CONTROLS_GAMEOVER_INDEX;
 }
 
 void Stage1_Load(void)
 {
     clsBG();
 
-    //set_bkg_data(0, 64, sprite_alpha);
+    set_bkg_data(0, 64, sprite_bg_lvl);
 
     set_interrupts(VBL_IFLAG);
 
-    inputCallIndex = 0;
+    inputCallIndex = CONTROLS_PLAYER_INDEX;
 }
 
 void Update(void)
 {
     switch (level)
     {
+    case LVL_STAGE1:
+        Stage1_Update();
     case LVL_GAMEOVER:
         GameOver_Update();
         break;
@@ -156,6 +158,11 @@ void MainMenu_Update(void)
 }
 
 void GameOver_Update(void)
+{
+    return;
+}
+
+void Stage1_Update(void)
 {
     return;
 }

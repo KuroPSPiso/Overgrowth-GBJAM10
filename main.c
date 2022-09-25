@@ -56,7 +56,7 @@ void updateSwitches(void) {
  *================================
  */
 void main() {
-	inputCallIndex = 1;
+	inputCallIndex = CONTROLS_DEFAULT_INDEX;
 
 	init();
 	clsBG();
