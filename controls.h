@@ -5,7 +5,7 @@
 #include "lvl.h"
 
 #define PLAYER_SPEED 4
-#define PLAYER_JUMP_VELOCITY 8
+#define PLAYER_JUMP_VELOCITY 16
 //move to ACTOR struct
 extern uint8_t player_x, player_y; 
 //end move

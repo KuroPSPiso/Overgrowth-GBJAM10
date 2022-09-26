@@ -227,18 +227,27 @@ void GameOver_Update(void)
 
 BOOL player_SpriteFlip_Walk = FALSE;
 uint8_t player_JumpVelocity = 0;
+BOOL hitFloor = TRUE;
 
 void PlayerInteraction()
 {
     player_x;
     player_y += GRAVITY; //gravity
     //check if tile above(below) is groundtiletype
-    BOOL hitFloor = TRUE;
+    
 
+    if (player_JumpVelocity > 0)
+    {
+        player_y -= player_JumpVelocity;
+        player_JumpVelocity >>= 1;
+    }
 
     if (hitFloor == TRUE && player_JUMP == TRUE)
     {
-        player_JumpVelocity += player_JumpVelocity;
+        player_JumpVelocity += PLAYER_JUMP_VELOCITY;
+        player_y-=PLAYER_JUMP_VELOCITY >> 1;
+        player_JUMP = FALSE;
+        hitFloor = FALSE;
     }
     if(hitFloor) player_y -= GRAVITY; //cancel gravity (check if need to pop back up)
 
