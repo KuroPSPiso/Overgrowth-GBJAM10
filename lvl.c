@@ -111,9 +111,43 @@ void Stage1_Load(void)
     set_bkg_data(1, 64, sprite_bg_lvl);
     //TODO: re-export lvl maps
 
-    set_bkg_based_tiles(0, 0, map_bg_lvl1_Width, map_bg_lvl1_Height, map_bg_lvl1, 0x01);
+    uint8_t offset = 0;
+    uint8_t short_map[24];
+    uint16_t mapOffset = 0;
+    for (uint8_t x = 0; x < 0x20; x++)
+    {
+        mapOffset += 24 * offset;
+        mapOffset = 24 * x;
+        short_map[0] = map_bg_lvl1[mapOffset + 0];
+        short_map[1] = map_bg_lvl1[mapOffset + 1];
+        short_map[2] = map_bg_lvl1[mapOffset + 2];
+        short_map[3] = map_bg_lvl1[mapOffset + 3];
+        short_map[4] = map_bg_lvl1[mapOffset + 4];
+        short_map[5] = map_bg_lvl1[mapOffset + 5];
+        short_map[6] = map_bg_lvl1[mapOffset + 6];
+        short_map[7] = map_bg_lvl1[mapOffset + 7];
+        short_map[8] = map_bg_lvl1[mapOffset + 8];
+        short_map[9] = map_bg_lvl1[mapOffset + 9];
+        short_map[10] = map_bg_lvl1[mapOffset + 10];
+        short_map[11] = map_bg_lvl1[mapOffset + 11];
+        short_map[12] = map_bg_lvl1[mapOffset + 12];
+        short_map[13] = map_bg_lvl1[mapOffset + 13];
+        short_map[14] = map_bg_lvl1[mapOffset + 14];
+        short_map[15] = map_bg_lvl1[mapOffset + 15];
+        short_map[16] = map_bg_lvl1[mapOffset + 16];
+        short_map[17] = map_bg_lvl1[mapOffset + 17];
+        short_map[18] = map_bg_lvl1[mapOffset + 18];
+        short_map[19] = map_bg_lvl1[mapOffset + 19];
+        short_map[20] = map_bg_lvl1[mapOffset + 20];
+        short_map[21] = map_bg_lvl1[mapOffset + 21];
+        short_map[22] = map_bg_lvl1[mapOffset + 22];
+        short_map[23] = map_bg_lvl1[mapOffset + 23];
+
+        set_bkg_based_tiles(x, 0, 1, 24, short_map, 0x01);
+    }
+    //set_bkg_based_tiles(5, 0, 5, 24, map_bg_lvl1BLK1, 0x01);
     //despawn every 0x10 blocks
-    set_bkg_based_tiles(0, 0, map_bg_lvl1_Width, map_bg_lvl1_Height, map_bg_lvl1, 0x01);
+    //set_bkg_based_tiles(0, 0, map_bg_lvl1_Width, map_bg_lvl1_Height, map_bg_lvl1, 0x01);
 
     set_interrupts(VBL_IFLAG);
 
