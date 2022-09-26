@@ -1,6 +1,8 @@
 #ifndef FUNC_H
 #define FUNC_H
 
+#define DEBUG 0
+
 //TODO: rem line on compile
 //#include <../../../include/gb/gb.h>
 #include <gb/gb.h>

@@ -70,23 +70,23 @@ void GameOver_Controls(void)
 void Player_Controls(void)
 {
 	joypad_state = joypad();
-	if (joypad_state == J_LEFT)
+	if (joypad_state & J_LEFT)
 	{
 		player_x--;
 		//cam_x -= CAM_SPEED;
 		//delay(100); //joypad delay
 	}
-	else if (joypad_state == J_RIGHT)
+	else if (joypad_state & J_RIGHT)
 	{
 		player_x++;
 		//cam_x += CAM_SPEED;
 		//delay(100); //joypad delay
 	}
-	if (joypad_state == J_UP)
+	if (joypad_state & J_UP)
 	{
 		player_y--;
 	}
-	if (joypad_state == J_DOWN)
+	if (joypad_state & J_DOWN)
 	{
 		player_y++;
 	}
@@ -101,7 +101,7 @@ void Player_Controls(void)
 		isFading = TRUE;
 		delay(200); //joypad delay
 	}
-	else if (joypad_state == J_START)
+	else if (joypad_state & J_START)
 	{
 		player_PAUSE = TRUE;
 	}
@@ -110,12 +110,12 @@ void Player_Controls(void)
 		player_ITEM = TRUE;
 	}
 
-	if (joypad_state == J_A)
+	if (joypad_state & J_A)
 	{
 		player_JUMP = TRUE;
 	}
 
-	if (joypad_state == J_A)
+	if (joypad_state & J_B)
 	{
 		player_ATTACK = TRUE;
 	}

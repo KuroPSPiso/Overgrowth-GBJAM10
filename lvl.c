@@ -79,6 +79,16 @@ void MainMenu_Load(void)
     set_bkg_based_tiles(4,14,5,1,map_alpha_press,0x3A);
     set_bkg_based_tiles(11,14,5,1,map_alpha_start,0x3A);
 
+    set_sprite_data(0, 23, sprite_farmer); //5 frames
+    set_sprite_tile(0, 1); //top_left
+    set_sprite_tile(1, 1); //bottom_left
+    set_sprite_tile(2, 1); //top_right
+    set_sprite_tile(3, 1); //bottom_right
+    move_sprite(0, 0, 0);
+    move_sprite(1, 0, 0);
+    move_sprite(2, 0, 0);
+    move_sprite(3, 0, 0);
+
     STAT_REG = 0x45;
     LYC_REG = 0;
 
@@ -164,11 +174,17 @@ void Stage1_Load(void)
     }
 
     //spawn player
-    player_x = 24;
-    player_y = 40;
-    set_sprite_data(0, 5, sprite_alpha);
-    set_sprite_tile(0, 1);
-    move_sprite(0, player_x, player_y);
+    player_x = 0x00;
+    player_y = 126;
+    set_sprite_data(0, 23, sprite_farmer); //5 frames
+    set_sprite_tile(0, 1); //top_left
+    set_sprite_tile(1, 1); //bottom_left
+    set_sprite_tile(2, 1); //top_right
+    set_sprite_tile(3, 1); //bottom_right
+    move_sprite(0, 0, 0);
+    move_sprite(1, 0, 0);
+    move_sprite(2, 0, 0);
+    move_sprite(3, 0, 0);
 
     set_interrupts(VBL_IFLAG);
 
@@ -181,6 +197,7 @@ void Update(void)
     {
     case LVL_STAGE1:
         Stage1_Update();
+        break;
     case LVL_GAMEOVER:
         GameOver_Update();
         break;
@@ -213,28 +230,154 @@ void clsBG(void)
     }
 }
 
-void MainMenu_Update(void)
-{
-    return;
-}
-
-void GameOver_Update(void)
-{
-    return;
-}
-
 #define GRAVITY 2
 
-BOOL player_SpriteFlip_Walk = FALSE;
+BOOL player_SpriteFlip = FALSE;
+BOOL player_SpriteFlipLEFT = FALSE;
+BOOL fixedY = FALSE;
 uint8_t player_JumpVelocity = 0;
-BOOL hitFloor = TRUE;
+uint16_t old_player_x = 0;
+uint8_t animation_timer = 0;
 
-void PlayerInteraction()
+void PlayerInteraction(void)
 {
-    player_x;
+    BOOL hitFloor = fixedY;
+    BOOL hitWall = FALSE;
+
     player_y += GRAVITY; //gravity
     //check if tile above(below) is groundtiletype
-    
+    uint8_t hitTile[16];
+    //uint8_t centerXInBG = (SCX_REG / 8) + ((player_x - 8) / 8); //minus -8 range
+    //uint8_t centerYInBG = (SCY_REG / 8) + ((player_y - 16) / 8); //minus -16 range
+    uint8_t centerXInBG = (SCX_REG >> 3) + ((player_x - 16) >> 3); //offset -1 tile X
+    uint8_t centerYInBG = (SCY_REG >> 3) + ((player_y - 24 - 3) >> 3); //offset -1 tile Y
+
+
+    //offscreen
+    if (centerXInBG >= 0xFE)
+    {
+        uint8_t tempHitTile[12];
+        get_bkg_tiles(0, centerYInBG, 3, 4, tempHitTile);
+        hitTile[0] = wall_tiles[0] + 0x01;
+        hitTile[1] = tempHitTile[0];
+        hitTile[2] = tempHitTile[1];
+        hitTile[3] = tempHitTile[2];
+        hitTile[4] = wall_tiles[0] + 0x01;
+        hitTile[5] = tempHitTile[3];
+        hitTile[6] = tempHitTile[4];
+        hitTile[7] = tempHitTile[5];
+        hitTile[8] = wall_tiles[0] + 0x01;
+        hitTile[9] = tempHitTile[6];
+        hitTile[10] = tempHitTile[7];
+        hitTile[11] = tempHitTile[8];
+        hitTile[12] = wall_tiles[0] + 0x01;
+        hitTile[13] = tempHitTile[9];
+        hitTile[14] = tempHitTile[10];
+        hitTile[15] = tempHitTile[11];
+    }
+    else
+    {
+        get_bkg_tiles(centerXInBG, centerYInBG, 4, 4, hitTile);
+    }
+
+    //2=x, 4=y = 14-16 (DOWN) 
+    //-0x01 (offset in tilemap) 
+    if (hitTile[13] - 0x01 == floor_tiles[0] ||
+        hitTile[13] - 0x01 == floor_tiles[1] ||
+        hitTile[13] - 0x01 == floor_tiles[2] ||
+        hitTile[13] - 0x01 == floor_tiles[3] ||
+        hitTile[13] - 0x01 == floor_tiles[4] ||
+        hitTile[14] - 0x01 == floor_tiles[0] ||
+        hitTile[14] - 0x01 == floor_tiles[1] ||
+        hitTile[14] - 0x01 == floor_tiles[2] ||
+        hitTile[14] - 0x01 == floor_tiles[3] ||
+        hitTile[14] - 0x01 == floor_tiles[4])
+    {
+        hitFloor = TRUE;
+    }
+    //1=x, 2=y || 1=x, 3=y(LEFT)
+    if (hitTile[4] - 0x01 == wall_tiles[0] ||
+        hitTile[4] - 0x01 == wall_tiles[1] ||
+        hitTile[8] - 0x01 == wall_tiles[0] ||
+        hitTile[8] - 0x01 == wall_tiles[1])
+    {
+        hitWall = TRUE;
+        player_x++;
+    }
+    //3=x, 2=y || 3=x, 2=y (RIGHT)
+    if (hitTile[7] - 0x01 == wall_tiles[0] ||
+        hitTile[7] - 0x01 == wall_tiles[1] ||
+        hitTile[11] - 0x01 == wall_tiles[0] ||
+        hitTile[11] - 0x01 == wall_tiles[1])
+    {
+        hitWall = TRUE;
+        player_x--;
+    }
+
+    //animations
+    uint8_t sprite_prop = get_sprite_prop(0);
+    if (hitFloor == FALSE)
+    {
+        //in air
+        set_sprite_tile(0, 0x08);
+        set_sprite_tile(1, 0x09);
+        set_sprite_tile(2, 0x0A);
+        set_sprite_tile(3, 0x0B);
+    }
+    else if (old_player_x == player_x)
+    {
+        //idle
+        if (animation_timer > 16)
+        {
+            player_SpriteFlip = (player_SpriteFlip == TRUE) ? FALSE : TRUE;
+            animation_timer = 0;
+        }
+        else
+        {
+            animation_timer++;
+        }
+        set_sprite_tile(0, 0x00 + (player_SpriteFlip << 2));
+        set_sprite_tile(1, 0x01 + (player_SpriteFlip << 2));
+        set_sprite_tile(2, 0x02 + (player_SpriteFlip << 2));
+        set_sprite_tile(3, 0x03 + (player_SpriteFlip << 2));
+    }
+    else if (old_player_x != player_x)
+    {
+        //running
+        if (animation_timer > 4)
+        {
+            player_SpriteFlip = (player_SpriteFlip == TRUE) ? FALSE : TRUE;
+            animation_timer = 0;
+        }
+        else
+        {
+            animation_timer++;
+        }
+        set_sprite_tile(0, 0x08 + (player_SpriteFlip << 2));
+        set_sprite_tile(1, 0x09 + (player_SpriteFlip << 2));
+        set_sprite_tile(2, 0x0A + (player_SpriteFlip << 2));
+        set_sprite_tile(3, 0x0B + (player_SpriteFlip << 2));
+        if(old_player_x < player_x && sprite_prop > 7 == 0x01)
+        {
+            set_sprite_prop(0, sprite_prop - S_FLIPX);
+            set_sprite_prop(1, sprite_prop - S_FLIPX);
+            set_sprite_prop(2, sprite_prop - S_FLIPX);
+            set_sprite_prop(3, sprite_prop - S_FLIPX);
+            player_SpriteFlipLEFT = FALSE;
+        }
+        else if(old_player_x > player_x && sprite_prop > 7 == 0x00)
+        {
+            set_sprite_prop(0, sprite_prop + S_FLIPX);
+            set_sprite_prop(1, sprite_prop + S_FLIPX);
+            set_sprite_prop(2, sprite_prop + S_FLIPX);
+            set_sprite_prop(3, sprite_prop + S_FLIPX);
+            player_SpriteFlipLEFT = TRUE;
+        }
+
+    }
+
+    //set_sprite_prop(0, sprite_prop & S_FLIPX ? sprite_prop | S_FLIPX : sprite_prop & S_FLIPX);
+    old_player_x = player_x;
 
     if (player_JumpVelocity > 0)
     {
@@ -245,22 +388,135 @@ void PlayerInteraction()
     if (hitFloor == TRUE && player_JUMP == TRUE)
     {
         player_JumpVelocity += PLAYER_JUMP_VELOCITY;
-        player_y-=PLAYER_JUMP_VELOCITY >> 1;
-        player_JUMP = FALSE;
+        player_y -= PLAYER_JUMP_VELOCITY >> 2;
         hitFloor = FALSE;
     }
-    if(hitFloor) player_y -= GRAVITY; //cancel gravity (check if need to pop back up)
+    player_JUMP = FALSE; //always false if not on the ground
+    if(hitFloor || fixedY) player_y -= GRAVITY; //cancel gravity (check if need to pop back up)
 
-    //debug
-    uint8_t map_debug_hitFloor[] = {
-        0x27 + hitFloor
-    };
+#if DEBUG == 1
     uint8_t offsetX = cam_x / 8;
     uint8_t offsetY = cam_y / 8;
-    set_bkg_based_tiles(offsetX + 2, offsetY + 2, 1, 1, map_debug_hitFloor, 0x01);
+
+    //debug floor hit
+    uint8_t map_debug_hit[] = {
+        0x27 + hitFloor
+    };
+    set_bkg_based_tiles(offsetX + 2, offsetY + 2, 1, 1, map_debug_hit, 0x01);
+    //debug wall hit
+    map_debug_hit[0] = 0x27 + hitWall;
+    set_bkg_based_tiles(offsetX + 4, offsetY + 2, 1, 1, map_debug_hit, 0x01);
+    //debug tile_detection
+    uint8_t no1 = hitTile[0] >> 4;
+    uint8_t no2 = hitTile[0] & 0x0F;
+    uint8_t map_debug_currFloorTile[] = {
+        0x27 + no1,
+        0x27 + no2
+    };
+    set_bkg_based_tiles(offsetX + 2, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[1] >> 4;
+    no2 = hitTile[1] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 5, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[2] >> 4;
+    no2 = hitTile[2] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 8, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+
+    no1 = hitTile[3] >> 4;
+    no2 = hitTile[3] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 2, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[4] >> 4;
+    no2 = hitTile[4] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 5, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[5] >> 4;
+    no2 = hitTile[5] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 8, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+
+    no1 = hitTile[6] >> 4;
+    no2 = hitTile[6] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 2, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[7] >> 4;
+    no2 = hitTile[7] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 5, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    no1 = hitTile[8] >> 4;
+    no2 = hitTile[8] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(offsetX + 8, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+
+    //debug player_pos
+    no1 = centerXInBG >> 4;
+    no2 = centerXInBG & 0x0F;
+    uint8_t map_debug_centerXInBG[] = {
+        0x27 + no1,
+        0x27 + no2
+    };
+    set_bkg_based_tiles(offsetX + 2, offsetY + 8, 2, 1, map_debug_centerXInBG, 0x01);
+    no1 = centerYInBG >> 4;
+    no2 = centerYInBG & 0x0F;
+    uint8_t map_debug_centerYInBG[] = {
+        0x27 + no1,
+        0x27 + no2
+    };
+    set_bkg_based_tiles(offsetX + 2, offsetY + 9, 2, 1, map_debug_centerYInBG, 0x01);
+#endif
+
+    uint8_t spritePos[4];
+    if (player_SpriteFlipLEFT == TRUE)
+    {
+        spritePos[0] = 2;
+        spritePos[1] = 3;
+        spritePos[2] = 0;
+        spritePos[3] = 1;
+    }
+    else
+    {
+        spritePos[0] = 0;
+        spritePos[1] = 1;
+        spritePos[2] = 2;
+        spritePos[3] = 3;
+    }
 
 
-    move_sprite(0, player_x, player_y);
+    move_sprite(spritePos[0], player_x, player_y);
+    move_sprite(spritePos[1], player_x, player_y + 8);
+    move_sprite(spritePos[2], player_x + 8, player_y);
+    move_sprite(spritePos[3], player_x + 8, player_y + 8);
+}
+
+void MainMenu_Update(void)
+{
+    fixedY = TRUE;
+    PlayerInteraction();
+    player_y = 140;
+    player_x++;
+    return;
+}
+
+void GameOver_Update(void)
+{
+    /*move_sprite(0, player_x, player_y);
+    move_sprite(1, player_x, player_y + 8);
+    move_sprite(2, player_x + 8, player_y);
+    move_sprite(3, player_x + 8, player_y + 8);*/
+    set_sprite_tile(0, 0x10);
+    set_sprite_tile(1, 0x11);
+    set_sprite_tile(2, 0x12);
+    set_sprite_tile(3, 0x13);
+    return;
 }
 
 uint16_t old_cam_x = 19200; //unset
@@ -268,7 +524,7 @@ uint16_t old_cam_y = 19200; //unset
 
 void Stage1_Update(void)
 {
-    PlayerInteraction();
+    fixedY = FALSE;
 
     if (cam_x > 1000) cam_x = 0; //limit camera min
     if (cam_x > 640) cam_x = 640; //limit camera max
@@ -305,5 +561,7 @@ void Stage1_Update(void)
 
     SCX_REG = cam_x;
     SCY_REG = cam_y;
+
+    PlayerInteraction();
     return;
 }

@@ -5,6 +5,7 @@
 #include "sprites/bg.h"
 #include "sprites/bg_lvl.h"
 #include "sprites/alpha.h"
+#include "sprites/spr_farmer.h"
 #include "maps/bg.h"
 #include "maps/alpha.h"
 #include "maps/bg_lvls.h"
