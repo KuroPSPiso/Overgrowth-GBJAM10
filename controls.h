@@ -4,9 +4,15 @@
 #include "FUNC.H"
 #include "lvl.h"
 
-#define PLAYER_SPEED 4;
-//extern uint8_t player_x;
-//extern uint8_t player_y; //move to another class
+#define PLAYER_SPEED 4
+#define PLAYER_JUMP_VELOCITY 8
+//move to ACTOR struct
+extern uint8_t player_x, player_y; 
+//end move
+extern BOOL player_JUMP;
+extern BOOL player_ATTACK;
+extern BOOL player_ITEM; //item selection - POP MENU
+extern BOOL player_PAUSE; //POP MENU
 
 #define CAM_SPEED 4;
 extern uint16_t cam_x, cam_y;

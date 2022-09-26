@@ -65,6 +65,9 @@ void MainMenu_Load(void)
 {
     clsBG();
 
+    SCX_REG = 0;
+    SCY_REG = 0;
+
     //draw bg
     set_bkg_data(0,25,sprite_bg_top);
     set_bkg_data(26,32,sprite_bg_bottom);
@@ -91,6 +94,9 @@ void MainMenu_Load(void)
 void GameOver_Load(void)
 {
     clsBG();
+
+    SCX_REG = 0;
+    SCY_REG = 0;
 
     set_bkg_data(1, 48, sprite_alpha);
     set_bkg_based_tiles(5, 6, 10, 1, map_alpha_gameOver, 0x01);
@@ -158,6 +164,11 @@ void Stage1_Load(void)
     }
 
     //spawn player
+    player_x = 24;
+    player_y = 40;
+    set_sprite_data(0, 5, sprite_alpha);
+    set_sprite_tile(0, 1);
+    move_sprite(0, player_x, player_y);
 
     set_interrupts(VBL_IFLAG);
 
@@ -193,9 +204,9 @@ void clsBG(void)
     }
     uint8_t cls_map[] = { 0x00 };
 
-    for (int x = 0; x < 20; x++)
+    for (int x = 0; x < 0x20; x++)
     {
-        for (int y = 0; y < 18; y++)
+        for (int y = 0; y < 0x17; y++)
         {
             set_bkg_tiles(x, y, 1, 1, cls_map);
         }
@@ -212,15 +223,47 @@ void GameOver_Update(void)
     return;
 }
 
+#define GRAVITY 2
+
+BOOL player_SpriteFlip_Walk = FALSE;
+uint8_t player_JumpVelocity = 0;
+
+void PlayerInteraction()
+{
+    player_x;
+    player_y += GRAVITY; //gravity
+    //check if tile above(below) is groundtiletype
+    BOOL hitFloor = TRUE;
+
+
+    if (hitFloor == TRUE && player_JUMP == TRUE)
+    {
+        player_JumpVelocity += player_JumpVelocity;
+    }
+    if(hitFloor) player_y -= GRAVITY; //cancel gravity (check if need to pop back up)
+
+    //debug
+    uint8_t map_debug_hitFloor[] = {
+        0x27 + hitFloor
+    };
+    uint8_t offsetX = cam_x / 8;
+    uint8_t offsetY = cam_y / 8;
+    set_bkg_based_tiles(offsetX + 2, offsetY + 2, 1, 1, map_debug_hitFloor, 0x01);
+
+
+    move_sprite(0, player_x, player_y);
+}
+
 uint16_t old_cam_x = 19200; //unset
 uint16_t old_cam_y = 19200; //unset
 
 void Stage1_Update(void)
 {
-    if (cam_x > 1000) cam_x = 0;
-    if (cam_x > 640) cam_x = 640;
+    PlayerInteraction();
 
-    
+    if (cam_x > 1000) cam_x = 0; //limit camera min
+    if (cam_x > 640) cam_x = 640; //limit camera max
+
     if (old_cam_x == 19200 || (32 + cam_x - old_cam_x) >= 40)
     {
         uint8_t offset = cam_x / 8;

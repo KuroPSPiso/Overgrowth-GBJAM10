@@ -72,15 +72,23 @@ void Player_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state == J_LEFT)
 	{
-		cam_x -= CAM_SPEED;
-		//SCX_REG--;
+		player_x--;
+		//cam_x -= CAM_SPEED;
 		//delay(100); //joypad delay
 	}
 	else if (joypad_state == J_RIGHT)
 	{
-		cam_x += CAM_SPEED;
-		//SCX_REG++;
+		player_x++;
+		//cam_x += CAM_SPEED;
 		//delay(100); //joypad delay
+	}
+	if (joypad_state == J_UP)
+	{
+		player_y--;
+	}
+	if (joypad_state == J_DOWN)
+	{
+		player_y++;
 	}
 
 	if (joypad_state == (J_START | J_SELECT))
@@ -92,5 +100,23 @@ void Player_Controls(void)
 		snd_set(SFX_NO_SOUND);
 		isFading = TRUE;
 		delay(200); //joypad delay
+	}
+	else if (joypad_state == J_START)
+	{
+		player_PAUSE = TRUE;
+	}
+	else if (joypad_state == J_SELECT)
+	{
+		player_ITEM = TRUE;
+	}
+
+	if (joypad_state == J_A)
+	{
+		player_JUMP = TRUE;
+	}
+
+	if (joypad_state == J_A)
+	{
+		player_ATTACK = TRUE;
 	}
 }
