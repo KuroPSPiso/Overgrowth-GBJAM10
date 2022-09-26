@@ -3,9 +3,12 @@
 
 #include "FUNC.H"
 #include "sprites/bg.h"
+#include "sprites/bg_lvl.h"
 #include "sprites/alpha.h"
+#include "sprites/spr_farmer.h"
 #include "maps/bg.h"
 #include "maps/alpha.h"
+#include "maps/bg_lvls.h"
 #include "controls.h"
 
 extern uint8_t level;
@@ -34,6 +37,7 @@ void Stage1_Load(void);
 void Update(void);
 void MainMenu_Update(void);
 void GameOver_Update(void);
+void Stage1_Update(void);
 
 //interupts
 void scrollMainMenuLCD();

@@ -51,14 +51,12 @@ void updateSwitches(void) {
 	SHOW_BKG;
 }
 
-CallPTR inputCallPTR;
-
 /*================================
  *-------------[MAIN]-------------
  *================================
  */
 void main() {
-	inputCallPTR = &defaultInput;
+	inputCallIndex = CONTROLS_DEFAULT_INDEX;
 
 	init();
 	clsBG();
@@ -68,7 +66,7 @@ void main() {
 	uint16_t localTimer = 0;
 
 	for (;;) {
-		BOOL doFadeTick = (localTimer >= CLOCKS_PER_SEC);// == 0 && localTimer != 0;
+		BOOL doFadeTick = (localTimer >= (CLOCKS_PER_SEC / 12));
 		if (doFadeTick == FALSE)
 		{
 			//add clock
@@ -79,7 +77,6 @@ void main() {
 			//reset clock
 			localTimer = 0;
 		}
-
 		if (transitionLvl == TRUE)
 		{
 			transitionLvl = FALSE;
@@ -89,7 +86,7 @@ void main() {
 		{
 			Update();
 
-			inputCallPTR();				  // Check for user input (and act on it)
+			inputCallPTR[inputCallIndex]();
 		}
 		updateSwitches();			// Make sure the SHOW_SPRITES and SHOW_BKG switches are on each loop
 		wait_vbl_done();			// Wait until VBLANK to avoid corrupting visual memory
