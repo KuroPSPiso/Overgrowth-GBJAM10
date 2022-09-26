@@ -2,6 +2,9 @@
 
 uint8_t player_x;
 uint8_t player_y;
+
+uint16_t cam_x, cam_y;
+
 BOOL player_JUMP;
 BOOL player_ATTACK;
 BOOL player_ITEM; //item selection - POP MENU
@@ -69,12 +72,14 @@ void Player_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state == J_LEFT)
 	{
-		SCX_REG--;
+		cam_x -= CAM_SPEED;
+		//SCX_REG--;
 		//delay(100); //joypad delay
 	}
 	else if (joypad_state == J_RIGHT)
 	{
-		SCX_REG++;
+		cam_x += CAM_SPEED;
+		//SCX_REG++;
 		//delay(100); //joypad delay
 	}
 
