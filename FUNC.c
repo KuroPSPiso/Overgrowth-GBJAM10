@@ -125,3 +125,83 @@ BOOL doFade(BOOL doTick)
 
 	return TRUE;
 }
+
+uint8_t mul(uint8_t x, uint8_t y)
+{
+	if (y == 0) return 0;
+	if (y == 1) return x;
+	if (y == 2) return x << 1;
+	if (y == 4) return x << 2;
+	if (y == 8) return x << 3;
+	if (y == 16) return x << 4;
+	if (y == 32) return x << 5;
+	if (y == 64) return x << 6;
+	if (y == 128) return x << 7;
+
+	uint8_t m = 0;
+	while (y > 0)
+	{
+		m += x;
+		y--;
+	}
+	return m;
+}
+
+uint8_t div(uint8_t x, uint8_t y, BOOL* err)
+{
+	if(y == 0)
+	{
+		err = true;
+		return 0;
+	}
+	err = false;
+	return div(x, y);
+}
+
+uint8_t div(uint8_t x, uint8_t y)
+{
+	if (y == 1 || y == 0) return x; //0 DIV NOT POSSIBLE (NO ERR HANDLING)
+	if (y == 2) return x >> 1;
+	if (y == 4) return x >> 2;
+	if (y == 8) return x >> 3;
+	if (y == 16) return x >> 4;
+	if (y == 32) return x >> 5;
+	if (y == 64) return x >> 6;
+	if (y == 128) return x >> 7;
+
+
+	uint8_t m = 0;
+	while (x > 0)
+	{
+		//todo: overflow check (replace with if ZERO flag isset in reg?)
+		if (y > x) return m;
+
+		x -= y;
+		m++;
+	}
+	return m;
+}
+
+uint8_t mod(uint8_t x, uint8_t y)
+{
+	if (y == 0 || y == 1 || y == 2 || y == 4 || y == 8 || y == 16 || y == 32 || y == 128)
+	{
+		int r = div(x, y);
+		x -= (mul(y, r));
+		return x;
+	}
+
+	//alternative solution
+	while (y < x)
+	{
+		x -= y;
+	}
+	return x;
+}
+
+void modLoopCheck(MODCHECK* rCheck, uint8_t x, uint8_t y)
+{
+	rCheck->F = FALSE;
+	if (x >= y) rCheck->F = TRUE;
+	rCheck->R = mod(x, y);
+}

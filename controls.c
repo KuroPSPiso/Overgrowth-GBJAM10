@@ -72,14 +72,15 @@ void Player_Controls(void)
 	joypad_state = joypad();
 	if (joypad_state & J_LEFT)
 	{
-		player_x--;
-		//cam_x -= CAM_SPEED;
+
+		//player_x--;
+		cam_x -= 1;
 		//delay(100); //joypad delay
 	}
 	else if (joypad_state & J_RIGHT)
 	{
-		player_x++;
-		//cam_x += CAM_SPEED;
+		//player_x++;
+		cam_x += 1;
 		//delay(100); //joypad delay
 	}
 	if (joypad_state & J_UP)

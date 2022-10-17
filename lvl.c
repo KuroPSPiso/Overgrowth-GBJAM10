@@ -243,18 +243,23 @@ void PlayerInteraction(void)
 {
     BOOL hitFloor = fixedY;
     BOOL hitWall = FALSE;
+    BOOL hasLooped = FALSE;
 
     player_y += GRAVITY; //gravity
     //check if tile above(below) is groundtiletype
     uint8_t hitTile[16];
     //uint8_t centerXInBG = (SCX_REG / 8) + ((player_x - 8) / 8); //minus -8 range
     //uint8_t centerYInBG = (SCY_REG / 8) + ((player_y - 16) / 8); //minus -16 range
-    uint8_t centerXInBG = (SCX_REG >> 3) + ((player_x - 16) >> 3); //offset -1 tile X
-    uint8_t centerYInBG = (SCY_REG >> 3) + ((player_y - 24 - 3) >> 3); //offset -1 tile Y
+    
+
+    uint8_t centerXInBG = ((cam_x >> 3) + (player_x >> 3) - 2);
+    uint8_t centerYInBG = ((cam_y >> 3) + (player_y - 2 >> 3) - 3);
+    //uint8_t centerXInBG = (SCX_REG >> 3) + ((player_x - 16) >> 3); //offset -1 tile X
+    //uint8_t centerYInBG = (SCY_REG >> 3) + ((player_y - 24 - 3) >> 3); //offset -1 tile Y
 
 
     //offscreen
-    if (centerXInBG >= 0xFE)
+    if (centerXInBG >= 0xFE) //no loop back check. (mod 0x1f)
     {
         uint8_t tempHitTile[12];
         get_bkg_tiles(0, centerYInBG, 3, 4, tempHitTile);
@@ -277,7 +282,63 @@ void PlayerInteraction(void)
     }
     else
     {
-        get_bkg_tiles(centerXInBG, centerYInBG, 4, 4, hitTile);
+        //TODO: fix modLoopCheck
+        //check if player check bounds is going to roll off screen
+        //MODCHECK modDidLoop = { .R = 0,  .F = FALSE };
+        //MODCHECK* modDidLoopPTR = &modDidLoop;
+        //modDidLoopPTR->R = mod(centerXInBG, 0x1F);
+        //hasLooped = modDidLoopPTR->F;
+        uint8_t centerXInBGLoop = mod(centerXInBG, 0x1F);
+        if (centerXInBG + 0x03 > 0x1F) hasLooped = TRUE;
+        //modLoopCheck(modDidLoopPTR, centerXInBG + 2, 0x1F);
+        if (hasLooped)
+        {
+            uint8_t hitTile2[16];
+            //todo: split check in 2 bg checks w/ rollback
+            get_bkg_tiles(centerXInBG, centerYInBG, 4, 4, hitTile);
+            get_bkg_tiles(0x00, centerYInBG, 4, 4, hitTile2);
+
+            if (centerXInBGLoop > 0x1F)
+            {
+                hitTile[4] = hitTile2[0];
+                hitTile[5] = hitTile2[1];
+                hitTile[6] = hitTile2[2];
+                hitTile[7] = hitTile2[3];
+
+                hitTile[8] = hitTile2[4];
+                hitTile[9] = hitTile2[5];
+                hitTile[10] = hitTile2[6];
+                hitTile[11] = hitTile2[7];
+
+                hitTile[12] = hitTile2[8];
+                hitTile[13] = hitTile2[9];
+                hitTile[14] = hitTile2[10];
+                hitTile[15] = hitTile2[11];
+            }
+            else if (centerXInBGLoop > 0x1E)
+            {
+                hitTile[8] = hitTile2[0];
+                hitTile[9] = hitTile2[1];
+                hitTile[10] = hitTile2[2];
+                hitTile[11] = hitTile2[3];
+
+                hitTile[12] = hitTile2[4];
+                hitTile[13] = hitTile2[5];
+                hitTile[14] = hitTile2[6];
+                hitTile[15] = hitTile2[7];
+            }
+            else if (centerXInBGLoop > 0x1D)
+            {
+                hitTile[12] = hitTile2[0];
+                hitTile[13] = hitTile2[1];
+                hitTile[14] = hitTile2[2];
+                hitTile[15] = hitTile2[3];
+            }
+        }
+        else 
+        {
+            get_bkg_tiles(centerXInBG, centerYInBG, 4, 4, hitTile);
+        }
     }
 
     //2=x, 4=y = 14-16 (DOWN) 
@@ -395,17 +456,24 @@ void PlayerInteraction(void)
     if(hitFloor || fixedY) player_y -= GRAVITY; //cancel gravity (check if need to pop back up)
 
 #if DEBUG == 1
-    uint8_t offsetX = cam_x / 8;
-    uint8_t offsetY = cam_y / 8;
+    uint8_t offsetX = cam_x >> 3; // cam_x >> 3; // / 8;
+    uint8_t offsetY = cam_y >> 3; // / 8;
+
+    
+    //if (offsetX 0x0B) offsetX -= 0x0B;
+    //if (offsetY > 0x0B) offsetY -= 0x0B;
 
     //debug floor hit
     uint8_t map_debug_hit[] = {
         0x27 + hitFloor
     };
-    set_bkg_based_tiles(offsetX + 2, offsetY + 2, 1, 1, map_debug_hit, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1f), offsetY + 2, 1, 1, map_debug_hit, 0x01);
     //debug wall hit
     map_debug_hit[0] = 0x27 + hitWall;
-    set_bkg_based_tiles(offsetX + 4, offsetY + 2, 1, 1, map_debug_hit, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1f), offsetY + 2, 1, 1, map_debug_hit, 0x01);
+    //debug has looped screen (X)
+    map_debug_hit[0] = 0x27 + hasLooped;
+    set_bkg_based_tiles(mod(offsetX + 8, 0x1f), offsetY + 2, 1, 1, map_debug_hit, 0x01);
     //debug tile_detection
     uint8_t no1 = hitTile[0] >> 4;
     uint8_t no2 = hitTile[0] & 0x0F;
@@ -413,65 +481,116 @@ void PlayerInteraction(void)
         0x27 + no1,
         0x27 + no2
     };
-    set_bkg_based_tiles(offsetX + 2, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    uint8_t map_debug_currFloorTile_dash[] = {
+        0x37
+    };
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 4, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[1] >> 4;
     no2 = hitTile[1] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 5, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 7, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[2] >> 4;
     no2 = hitTile[2] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 8, offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
-
+    set_bkg_based_tiles(mod(offsetX + 8, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 10, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[3] >> 4;
     no2 = hitTile[3] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 2, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 11, 0x1f), offsetY + 4, 2, 1, map_debug_currFloorTile, 0x01);
+
     no1 = hitTile[4] >> 4;
     no2 = hitTile[4] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 5, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 4, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[5] >> 4;
     no2 = hitTile[5] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 8, offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
-
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 7, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[6] >> 4;
     no2 = hitTile[6] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 2, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 8, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 10, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile_dash, 0x01);
     no1 = hitTile[7] >> 4;
     no2 = hitTile[7] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 5, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 11, 0x1f), offsetY + 5, 2, 1, map_debug_currFloorTile, 0x01);
+
     no1 = hitTile[8] >> 4;
     no2 = hitTile[8] & 0x0F;
     map_debug_currFloorTile[0] = 0x27 + no1;
     map_debug_currFloorTile[1] = 0x27 + no2;
-    set_bkg_based_tiles(offsetX + 8, offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 4, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[9] >> 4;
+    no2 = hitTile[9] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 7, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[10] >> 4;
+    no2 = hitTile[10] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 8, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 10, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[11] >> 4;
+    no2 = hitTile[11] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 11, 0x1f), offsetY + 6, 2, 1, map_debug_currFloorTile, 0x01);
+
+    no1 = hitTile[12] >> 4;
+    no2 = hitTile[12] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 4, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[13] >> 4;
+    no2 = hitTile[13] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 7, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[14] >> 4;
+    no2 = hitTile[14] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 8, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 10, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile_dash, 0x01);
+    no1 = hitTile[15] >> 4;
+    no2 = hitTile[15] & 0x0F;
+    map_debug_currFloorTile[0] = 0x27 + no1;
+    map_debug_currFloorTile[1] = 0x27 + no2;
+    set_bkg_based_tiles(mod(offsetX + 11, 0x1f), offsetY + 7, 2, 1, map_debug_currFloorTile, 0x01);
 
     //debug player_pos
-    no1 = centerXInBG >> 4;
-    no2 = centerXInBG & 0x0F;
+    no1 = centerXInBG >> 4;//((cam_x >> 3) + (player_x >> 3)) >> 4;//centerXInBG >> 4;
+    no2 = centerXInBG & 0x0F;//((cam_x >> 3) + (player_x >> 3)) & 0x0F;//centerXInBG & 0x0F;
     uint8_t map_debug_centerXInBG[] = {
         0x27 + no1,
         0x27 + no2
     };
-    set_bkg_based_tiles(offsetX + 2, offsetY + 8, 2, 1, map_debug_centerXInBG, 0x01);
-    no1 = centerYInBG >> 4;
-    no2 = centerYInBG & 0x0F;
+    set_bkg_based_tiles(mod(offsetX + 2, 0x1F), offsetY + 0, 2, 1, map_debug_centerXInBG, 0x01);
+    no1 = centerYInBG >> 4;//((cam_y >> 3) + (player_y >> 3)) >> 4;//centerYInBG >> 4;
+    no2 = centerYInBG & 0x0F;//((cam_y >> 3) + (player_y >> 3)) & 0x0F;//centerYInBG & 0x0F;
     uint8_t map_debug_centerYInBG[] = {
         0x27 + no1,
         0x27 + no2
     };
-    set_bkg_based_tiles(offsetX + 2, offsetY + 9, 2, 1, map_debug_centerYInBG, 0x01);
+    set_bkg_based_tiles(mod(offsetX + 5, 0x1F), offsetY + 0, 2, 1, map_debug_centerYInBG, 0x01);
 #endif
 
     uint8_t spritePos[4];

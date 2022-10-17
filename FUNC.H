@@ -1,7 +1,7 @@
 #ifndef FUNC_H
 #define FUNC_H
 
-#define DEBUG 0
+#define DEBUG 1
 
 //TODO: rem line on compile
 //#include <../../../include/gb/gb.h>
@@ -40,5 +40,19 @@ extern BOOL transitionLvl;
 
 //used for lvl transitions
 extern BOOL doFade(BOOL doTick);
+
+
+//math
+struct MODCHECK
+{
+	uint8_t R; //result
+	BOOL F; //checkflag
+};
+typedef struct MODCHECK MODCHECK;
+
+extern uint8_t mul(uint8_t x, uint8_t y);
+extern uint8_t div(uint8_t x, uint8_t y);
+extern uint8_t mod(uint8_t x, uint8_t y);
+extern void modLoopCheck(MODCHECK* rCheck, uint8_t x, uint8_t y);
 
 #endif //FUNC_H
